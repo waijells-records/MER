@@ -1,6 +1,8 @@
+import os
 from telegram import Update
 from telegram.ext import ApplicationBuilder, CommandHandler, ContextTypes
 
+# Команда /video
 async def video_intro(update: Update, context: ContextTypes.DEFAULT_TYPE):
     # Сообщение 1
     await update.message.reply_text(
@@ -13,12 +15,15 @@ async def video_intro(update: Update, context: ContextTypes.DEFAULT_TYPE):
     )
 
     # Сообщение 2 — видео
-    with open("intro.mp4", "rb") as video:
-        await update.message.reply_video(
-            video=video,
-            caption="⬆️ Это краткое видео о проекте *«Стань Ближе»*",
-            parse_mode="Markdown"
-        )
+    try:
+        with open("intro.mp4", "rb") as video:
+            await update.message.reply_video(
+                video=video,
+                caption="⬆️ Это краткое видео о проекте *«Стань Ближе»*",
+                parse_mode="Markdown"
+            )
+    except FileNotFoundError:
+        await update.message.reply_text("⚠️ Видео не найдено. Убедитесь, что файл intro.mp4 загружен в репозиторий.")
 
     # Сообщение 3 — для кого проект
     await update.message.reply_text(
@@ -39,6 +44,7 @@ async def video_intro(update: Update, context: ContextTypes.DEFAULT_TYPE):
         parse_mode="Markdown"
     )
 
-app = ApplicationBuilder().token("ТВОЙ_ТОКЕН").build()
+# Подключение
+app = ApplicationBuilder().token(os.getenv("TOKEN")).build()
 app.add_handler(CommandHandler("video", video_intro))
 app.run_polling()
